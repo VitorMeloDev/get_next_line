@@ -71,6 +71,10 @@ int main(void)
     int fd = open("Hello", O_RDONLY);
     char *str = get_next_line(fd);
     printf("%s", str);
+    str = get_next_line(fd);
+    printf("%s", str);
+
+    close(fd);
 }
 
 char    *get_next_line(int fd)
@@ -80,12 +84,18 @@ char    *get_next_line(int fd)
     static char *resto = NULL;
     ssize_t n = 0;
 
-    n = read(fd, str, size_buffer);
-    str[n] = '\0';
-    resto = checar(str, n);
+    if(!resto)
+    {
+        n = read(fd, str, size_buffer);
+        str[n] = '\0';
+        resto = checar(str, n);
+    }
+    else
+    {
+        return (resto, free(resto), resto == NULL);
+    }
 
     //write(1, str, size_buffer -1);
-    close(fd);
-    printf("%s", resto);
+    //printf("%s", resto);
     return (pegar_str(str));
 }
