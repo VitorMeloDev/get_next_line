@@ -5,97 +5,57 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: vfreitass <vfreitas@student.42sp.org.br    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/16 05:33:19 by vfreitass         #+#    #+#             */
-/*   Updated: 2026/06/16 08:27:51 by vfreitass        ###   ########.fr       */
+/*   Created: 2026/06/21 13:20:56 by vfreitass         #+#    #+#             */
+/*   Updated: 2026/06/21 13:20:56 by vfreitass        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <fcntl.h>
-#include <unistd.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <fcntl.h>
+#include "get_next_line.h"
 
-char *subresto(char *str, int start, int size)
+char	*get_next_line(int fd)
 {
-    char *resto;
-    int size_r;
-    int i = 0;
-    start++;
-    size_r = size - start;
-    resto = malloc(sizeof(char) * (size_r + 1));
-    while (i < size_r)
-    {
-        if (str[start + i] == '\n')
-            break;
-        resto[i] = str[start + i];
-        i++;
-    }
-    resto[i] = '\0';
-    return (resto);
+	int			buffer_size;
+	static char	*line;
+	char		*str;
+	char		*to_re;
+	int			n;
+
+	buffer_size = 10;
+	n = 1;
+	str = malloc(sizeof(char) * (buffer_size + 1));
+	while (!ft_strchr(str, '\n') && n != 0)
+	{
+		n = read(fd, str, buffer_size);
+		str[n] = '\0';
+		line = vm_strjoin(line, str);
+	}
+	to_re = line;
+	line = get_rest(line);
+	return (extract_line(to_re));
 }
 
-char *checar(char *str, int size)
+int	main(void)
 {
-    int i = 0;
+	int		fd;
+	char	*str;
 
-    while (str[i] != '\0')
-    {
-        if(str[i] == '\n')
-            return (subresto(str, i, size));
-        i++;
-    }
-    return (NULL);
-}
-
-char    *pegar_str(char *str)
-{
-    char *str_s;
-    int size = 0;
-    int i = 0;
-    while (str[size] != '\0' && str[size] != '\n')
-        size++;
-    str_s = malloc(sizeof(char) * (size + 1));
-    while (i < size)
-    {
-        str_s[i] = str[i];
-        i++;
-    }
-    str_s[i] = '\0';
-    return (str_s);
-}
-
-char    *get_next_line(int fd);
-
-int main(void)
-{
-    int fd = open("Hello", O_RDONLY);
-    char *str = get_next_line(fd);
-    printf("%s", str);
-    str = get_next_line(fd);
-    printf("%s", str);
-
-    close(fd);
-}
-
-char    *get_next_line(int fd)
-{
-    int size_buffer = 100;
-    char    str[size_buffer];
-    static char *resto = NULL;
-    ssize_t n = 0;
-
-    if(!resto)
-    {
-        n = read(fd, str, size_buffer);
-        str[n] = '\0';
-        resto = checar(str, n);
-    }
-    else
-    {
-        return (resto, free(resto), resto == NULL);
-    }
-
-    //write(1, str, size_buffer -1);
-    //printf("%s", resto);
-    return (pegar_str(str));
+	fd = open("Hello", O_RDONLY);
+	if (fd < 0)
+		return (1);
+	str = get_next_line(fd);
+	printf(" - 1: %s\n", str);
+	free(str);
+	str = get_next_line(fd);
+	printf(" - 2: %s\n", str);
+	free(str);
+	str = get_next_line(fd);
+	printf(" - 3: %s\n", str);
+	free(str);
+	str = get_next_line(fd);
+	printf(" - 4: %s\n", str);
+	free(str);
+	close(fd);
+	return (0);
 }
