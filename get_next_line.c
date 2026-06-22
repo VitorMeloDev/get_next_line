@@ -17,21 +17,21 @@
 char	*get_str(int fd, char *rest)
 {
 	char		*str;
-	int			buffer_size;
-	int			n;
+	ssize_t		n;
 
-	buffer_size = 10;
-	str = malloc (sizeof(char) * (buffer_size + 1));
+	str = malloc (sizeof(char) * (BUFFER_SIZE + 1));
 	if (!str)
 		return (rest);
 	str[0] = '\0';
 	n = 1;
 	while (!ft_strchr(str, '\n') && n != 0)
 	{
-		n = read(fd, str, buffer_size);
+		n = read(fd, str, BUFFER_SIZE);
 		if (n <= 0)
 		{
 			free(str);
+			if (rest && rest[0] != '\0')
+				return (rest);
 			free(rest);
 			return (NULL);
 		}
@@ -56,6 +56,11 @@ char	*extract_line(char *str)
 	while (str[i] != '\0' && str[i] != '\n')
 	{
 		line[i] = str[i];
+		i++;
+	}
+	if (str[i] == '\n')
+	{
+		line[i] = '\n';
 		i++;
 	}
 	line[i] = '\0';
@@ -110,7 +115,7 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-int	main(void)
+/*int	main(void)
 {
 	int		fd;
 	char	*str;
@@ -132,4 +137,4 @@ int	main(void)
 	free(str);
 	close(fd);
 	return (0);
-}
+}*/
