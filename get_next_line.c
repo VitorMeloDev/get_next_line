@@ -14,26 +14,100 @@
 #include <fcntl.h>
 #include "get_next_line.h"
 
-char	*get_next_line(int fd)
+char	*get_str(int fd, char *rest)
 {
-	int			buffer_size;
-	static char	*line;
 	char		*str;
-	char		*to_re;
+	int			buffer_size;
 	int			n;
 
 	buffer_size = 10;
+	str = malloc (sizeof(char) * (buffer_size + 1));
+	if (!str)
+		return (rest);
+	str[0] = '\0';
 	n = 1;
-	str = malloc(sizeof(char) * (buffer_size + 1));
 	while (!ft_strchr(str, '\n') && n != 0)
 	{
 		n = read(fd, str, buffer_size);
+		if (n <= 0)
+		{
+			free(str);
+			free(rest);
+			return (NULL);
+		}
 		str[n] = '\0';
-		line = vm_strjoin(line, str);
+		rest = ft_strjoin(rest, str);
 	}
-	to_re = line;
-	line = get_rest(line);
-	return (extract_line(to_re));
+	free(str);
+	return (rest);
+}
+
+char	*extract_line(char *str)
+{
+	char	*line;
+	int		i;
+
+	if (!str)
+		return (NULL);
+	i = 0;
+	line = malloc(sizeof(char) * (ft_strlen(str) + 2));
+	if (!line)
+		return (NULL);
+	while (str[i] != '\0' && str[i] != '\n')
+	{
+		line[i] = str[i];
+		i++;
+	}
+	line[i] = '\0';
+	return (line);
+}
+
+char	*get_rest(char *buf)
+{
+	int		i;
+	int		j;
+	char	*new_buf;
+
+	i = 0;
+	while (buf[i] != '\0' && buf[i] != '\n')
+		i++;
+	if (buf[i] == '\n')
+		i++;
+	if (buf[i] == '\0')
+	{
+		free(buf);
+		return (NULL);
+	}
+	new_buf = malloc(sizeof(char) * (ft_strlen(&buf[i]) + 1));
+	if (!new_buf)
+		return (NULL);
+	j = 0;
+	while (buf[i] != '\0')
+		new_buf[j++] = buf[i++];
+	new_buf[j] = '\0';
+	free(buf);
+	return (new_buf);
+}
+
+char	*get_next_line(int fd)
+{
+	char		*line;
+	static char	*buf;
+
+	if (fd < 0)
+		return (NULL);
+	buf = get_str(fd, buf);
+	if (!buf)
+		return (NULL);
+	line = extract_line(buf);
+	if (!line)
+	{
+		free(buf);
+		buf = NULL;
+		return (NULL);
+	}
+	buf = get_rest(buf);
+	return (line);
 }
 
 int	main(void)
