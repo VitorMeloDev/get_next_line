@@ -24,7 +24,7 @@ char	*get_str(int fd, char *rest)
 		return (rest);
 	str[0] = '\0';
 	n = 1;
-	while (!ft_strchr(str, '\n') && n != 0)
+	while (!ft_strchr(rest, '\n') && n != 0)
 	{
 		n = read(fd, str, BUFFER_SIZE);
 		if (n <= 0)
@@ -115,12 +115,12 @@ char	*get_next_line(int fd)
 	return (line);
 }
 
-/*int	main(void)
+int	main(void)
 {
 	int		fd;
 	char	*str;
 
-	fd = open("Hello", O_RDONLY);
+	fd = open("Tomb Raider", O_RDONLY);
 	if (fd < 0)
 		return (1);
 	str = get_next_line(fd);
@@ -137,4 +137,4 @@ char	*get_next_line(int fd)
 	free(str);
 	close(fd);
 	return (0);
-}*/
+}
